@@ -2,8 +2,7 @@
 using IdentityServer4;
 using IdentityServer4.Models;
 
-namespace SecuringAngularApps.STS
-{
+namespace SecuringAngularApps.STS{
     public class Config
     {
         public static IEnumerable<ApiResource> GetApiResources()
@@ -27,9 +26,9 @@ namespace SecuringAngularApps.STS
                     RequirePkce = true,
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
+                    
 
-
-                    RedirectUris =           { "http://localhost:4200/signin-callback", "http://localhost:4200/assets/silent-callback.html" },
+                    RedirectUris =           { "http://localhost:4200/signin-callback",  },
                     PostLogoutRedirectUris = { "http://localhost:4200/signout-callback" },
                     AllowedCorsOrigins =     { "http://localhost:4200" },
 
@@ -38,30 +37,7 @@ namespace SecuringAngularApps.STS
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         "projects-api"
-                    },
-                    AccessTokenLifetime = 600
-                },
-                new Client
-                {
-                    ClientId = "mvc",
-                    ClientName = "MVC Client",
-                    AllowedGrantTypes = GrantTypes.Hybrid,
-
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-
-                    RedirectUris           = { "http://localhost:4201/signin-oidc" },
-                    PostLogoutRedirectUris = { "http://localhost:4201/signout-callback-oidc" },
-
-                    AllowedScopes =
-                    {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
-                    },
-                    AllowOfflineAccess = true
-
+                    }
                 }
             };
 

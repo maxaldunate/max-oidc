@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
-using IdentityServer4.Services;
+using SecuringAngularApps.STS.Data;
+using SecuringAngularApps.STS.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SecuringAngularApps.STS.Data;
-using SecuringAngularApps.STS.Models;
-using SecuringAngularApps.STS.Quickstart.Account;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using IdentityServer4.Services;
 
 namespace SecuringAngularApps.STS
 {
@@ -39,14 +40,12 @@ namespace SecuringAngularApps.STS
                 {
                     corsBuilder.AllowAnyHeader()
                     .AllowAnyMethod()
-                    .SetIsOriginAllowed(origin => origin == "http://localhost:4200")
+                    .AllowAnyOrigin()
                     .AllowCredentials();
                 });
             });
 
             services.AddMvc();
-            services.AddTransient<IProfileService, CustomProfileService>();
-
 
             var builder = services.AddIdentityServer(options =>
                 {
@@ -54,13 +53,11 @@ namespace SecuringAngularApps.STS
                     options.Events.RaiseInformationEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
-                    options.Authentication.CookieLifetime = TimeSpan.FromMinutes(15);
                 })
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())
-                .AddAspNetIdentity<ApplicationUser>()
-                .AddProfileService<CustomProfileService>();
+                .AddAspNetIdentity<ApplicationUser>();
 
 
             if (Environment.IsDevelopment())
