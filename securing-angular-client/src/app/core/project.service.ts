@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Constants } from '../constants';
 import { Milestone } from '../model/milestone';
 import { MilestoneStatus } from '../model/milestone-status';
@@ -8,19 +8,14 @@ import { Project } from '../model/project';
 import { UserPermission } from '../model/user-permission';
 import { UserProfile } from '../model/user-profile';
 import { CoreModule } from './core.module';
-import { AuthService } from './auth-service.component';
 
 
-@Injectable()
+@Injectable({ providedIn: CoreModule})
 export class ProjectService {
-    constructor(private _httpClient: HttpClient,
-                private _authService: AuthService) { }
+    constructor(private _httpClient: HttpClient) { }
     
     getProjects(): Observable<Project[]> {
-        return from(this._authService.getAccessToken().then(token => {
-            const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-            return this._httpClient.get<Project[]>(Constants.apiRoot + 'Projects', {headers: headers}).toPromise();
-        }));
+        return this._httpClient.get<Project[]>(Constants.apiRoot + 'Projects');
     }
 
     getProject(projectId: number): Observable<Project> {

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './core/auth-service.component';
 
 @Component({
   selector: 'app-root',
@@ -7,29 +6,10 @@ import { AuthService } from './core/auth-service.component';
   styleUrls: []
 })
 export class AppComponent implements OnInit {
-  isLoggedIn = false;
 
-  constructor(private _authService: AuthService) {
-    this._authService.loginChanged.subscribe(loggedIn => {
-      this.isLoggedIn = loggedIn;
-    })
-  }
+  constructor(
+  ) {}
 
   ngOnInit() {
-    this._authService.isLoggedIn().then(loggedIn => {
-      this.isLoggedIn = loggedIn;
-    })
-  }
-
-  login() {
-    this._authService.login();
-  }
-
-  logout() {
-    this._authService.logout();
-  }
-
-  isAdmin() {
-    return this._authService.authContext && this._authService.authContext.isAdmin;
   }
 }
