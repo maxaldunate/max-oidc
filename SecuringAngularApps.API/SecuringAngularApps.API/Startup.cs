@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
-using IdentityServer4.AccessTokenValidation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,32 +29,11 @@ namespace SecuringAngularApps.API
                 {
                     builder.AllowAnyHeader()
                     .AllowAnyMethod()
-                    .SetIsOriginAllowed(origin => origin == "http://localhost:4200")
+                    .AllowAnyOrigin()
                     .AllowCredentials();
                 });
             });
-
-            //services.AddAuthentication("Bearer")
-            //    .AddJwtBearer("Bearer", options =>
-            //    {
-            //        options.Authority = "http://localhost:4242";
-            //        options.Audience = "projects-api";
-            //        options.RequireHttpsMetadata = false;
-            //    });
-            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-                       .AddIdentityServerAuthentication(options =>
-                       {
-                           options.Authority = "http://localhost:4242";
-                           options.ApiName = "projects-api";
-                           options.RequireHttpsMetadata = false;
-                       });
-            services.AddMvc(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,7 +44,6 @@ namespace SecuringAngularApps.API
                 app.UseDeveloperExceptionPage();
             }
             app.UseCors("AllRequests");
-            app.UseAuthentication();
             app.UseMvc();
         }
     }
