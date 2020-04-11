@@ -28,6 +28,9 @@ namespace SecuringAngularApps.API.Controllers
         //[AllowAnonymous]
         public IEnumerable<Project> GetProjects()
         {
+            User.Claims.ToList().ForEach( x => 
+                Console.WriteLine($"Type='{x.Type}' Value='{x.Value}'") 
+            );
             return _context.Projects;
         }
 
