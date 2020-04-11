@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +33,22 @@ namespace SecuringAngularApps.API
                     .AllowCredentials();
                 });
             });
-            services.AddMvc();
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", opts =>
+                {
+                    opts.Authority = "http://localhost:4242";
+                    opts.Audience = "projects-api";
+                    opts.RequireHttpsMetadata = false;
+                });
+            //services.AddMvc();
+            services.AddMvc(opts =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                opts.Filters.Add(new AuthorizeFilter(policy));
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +59,7 @@ namespace SecuringAngularApps.API
                 app.UseDeveloperExceptionPage();
             }
             app.UseCors("AllRequests");
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

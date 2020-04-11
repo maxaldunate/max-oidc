@@ -13,6 +13,7 @@ namespace SecuringAngularApps.API.Controllers
 {
     [Produces("application/json")]
     [Route("api/Projects")]
+    //[Authorize]
     public class ProjectsController : Controller
     {
         private readonly ProjectDbContext _context;
@@ -24,6 +25,7 @@ namespace SecuringAngularApps.API.Controllers
 
         // GET: api/Projects
         [HttpGet]
+        //[AllowAnonymous]
         public IEnumerable<Project> GetProjects()
         {
             return _context.Projects;
