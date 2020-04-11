@@ -7,10 +7,10 @@ export class Constants {
 	public static apiRoot = 'http://localhost:2112/api/';
 
 	// Identity Server 4 local
-	//public static stsAuthority = 'http://localhost:4242/';
-	// public static clientId = 'spa-client';
+	public static stsAuthority = 'http://localhost:4242/';
+	public static clientId = 'spa-client';
 	
 	// Auth0
-	public static stsAuthority = 'https://dev-ymuww1mc.eu.auth0.com/';
-	public static clientId = 'uYEjhVUuZIs3GZdgJPV1QZLsaOq180vf';
+	//public static stsAuthority = 'https://dev-ymuww1mc.eu.auth0.com/';
+	//public static clientId = 'uYEjhVUuZIs3GZdgJPV1QZLsaOq180vf';
 }
