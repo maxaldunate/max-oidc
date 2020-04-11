@@ -29,7 +29,8 @@ namespace SecuringAngularApps.API
                 {
                     builder.AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowAnyOrigin()
+                    //.AllowAnyOrigin()
+                    .SetIsOriginAllowed( origin => origin == "http://localhost:4200")
                     .AllowCredentials();
                 });
             });

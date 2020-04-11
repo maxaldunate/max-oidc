@@ -40,7 +40,8 @@ namespace SecuringAngularApps.STS
                 {
                     corsBuilder.AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowAnyOrigin()
+                    //.AllowAnyOrigin()
+                    .SetIsOriginAllowed(origin => origin == "http://localhost:4200")
                     .AllowCredentials();
                 });
             });
