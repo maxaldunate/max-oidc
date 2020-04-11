@@ -4,7 +4,7 @@ import { UserManager, User} from 'oidc-client';
 import { Constants } from '../constants';
 import { Subject } from 'rxjs';
 
-@Injectable({providedIn: CoreModule})
+@Injectable()
 export class AuthService {
     private _userManager: UserManager;
     private _user: User;

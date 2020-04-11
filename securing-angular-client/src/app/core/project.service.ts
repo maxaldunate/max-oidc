@@ -11,7 +11,7 @@ import { CoreModule } from './core.module';
 import { AuthService } from './auth-service.component';
 
 
-@Injectable({ providedIn: CoreModule})
+@Injectable()
 export class ProjectService {
     constructor(private _httpClient: HttpClient,
                 private _authService: AuthService) { }
