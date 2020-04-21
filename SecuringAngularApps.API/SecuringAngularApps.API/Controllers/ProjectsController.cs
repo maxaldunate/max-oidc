@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,10 +29,16 @@ namespace SecuringAngularApps.API.Controllers
         //[AllowAnonymous]
         public IEnumerable<Project> GetProjects()
         {
-            User.Claims.ToList().ForEach( x => 
-                Console.WriteLine($"Type='{x.Type}' Value='{x.Value}'") 
-            );
-            return _context.Projects;
+            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            claims.ForEach(x => Console.WriteLine($"Type='{x.Type}' Value='{x.Value}'"));
+
+            var userId = this.User.FindFirstValue(JwtClaimTypes.Subject);
+            var userProjectIds = _context.UserPermissions
+                .Where(up => up.ProjectId.HasValue && up.UserProfileId == userId)
+                .Select(up => up.ProjectId.Value).ToList();
+
+            return _context.Projects.Where(p => userProjectIds.Contains(p.Id));
+            //return _context.Projects;
         }
 
         // GET: api/Projects/5
@@ -42,6 +49,7 @@ namespace SecuringAngularApps.API.Controllers
             {
                 return BadRequest(ModelState);
             }
+            if (!await ProjectEditAccessCheck(id, false)) return Forbid();
 
             var project = await _context.Projects
                 .Include("UserPermissions")
@@ -81,7 +89,7 @@ namespace SecuringAngularApps.API.Controllers
             {
                 return BadRequest();
             }
-
+            if (!await ProjectEditAccessCheck(id, true)) return Forbid();
             _context.Entry(project).State = EntityState.Modified;
 
             try
@@ -146,6 +154,7 @@ namespace SecuringAngularApps.API.Controllers
         {
             var item = await _context.Milestones.FirstOrDefaultAsync(m => m.Id == milestone.Id);
             if (item != null) return StatusCode(409);
+            if (!await MilestoneAccessCheck(item)) return Forbid();
             _context.Milestones.Add(milestone);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetProject", new { id = milestone.ProjectId }, milestone);
@@ -156,6 +165,7 @@ namespace SecuringAngularApps.API.Controllers
         {
             var item = await _context.Milestones.FirstOrDefaultAsync(m => m.Id == id);
             if (item == null) return NotFound();
+            if (!await MilestoneAccessCheck(item)) return Forbid();
             _context.Milestones.Remove(item);
             await _context.SaveChangesAsync();
             return Ok();
@@ -167,10 +177,29 @@ namespace SecuringAngularApps.API.Controllers
             if (milestone.Id != id) return BadRequest();
             var item = await _context.Milestones.FirstOrDefaultAsync(ms => ms.Id == id);
             if (item == null) return NotFound();
+            if (!await MilestoneAccessCheck(item)) return Forbid();
             item.MilestoneStatusId = milestone.MilestoneStatusId;
             item.Name = milestone.Name;
             await _context.SaveChangesAsync();
             return Ok(milestone);
+        }
+
+        private async Task<bool> MilestoneAccessCheck(Milestone item)
+        {
+            var userId = this.User.FindFirstValue(JwtClaimTypes.Subject);
+            var perm = await _context.UserPermissions.FirstOrDefaultAsync(up =>
+                up.ProjectId == item.ProjectId && up.UserProfileId == userId
+            );
+            return perm != null && perm.Value == "Edit";
+        }
+
+        private async Task<bool> ProjectEditAccessCheck(int projectId, bool edit)
+        {
+            var userId = this.User.FindFirstValue(JwtClaimTypes.Subject);
+            var userAccess = await _context.UserPermissions.FirstOrDefaultAsync(up =>
+                up.ProjectId == projectId && up.UserProfileId == userId
+            );
+            return userAccess != null && (edit ? userAccess.Value == "Edit" : true);
         }
 
         [HttpGet("MilestoneStatuses")]
