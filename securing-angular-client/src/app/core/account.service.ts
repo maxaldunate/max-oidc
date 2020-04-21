@@ -6,7 +6,7 @@ import { Constants } from '../constants';
 import { UserProfile } from '../model/user-profile';
 import { CoreModule } from './core.module';
 
-@Injectable({ providedIn: CoreModule})
+@Injectable()
 export class AccountService {
     userProfile: UserProfile;
     constructor(private _httpClient: HttpClient) { }
